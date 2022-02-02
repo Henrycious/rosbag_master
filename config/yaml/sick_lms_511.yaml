@@ -1,0 +1,12 @@
+sick_scan:
+	ros_parameters:
+		hostname:"131.173.120.103"
+		sw_pll_only_publish:False
+    min_ang: -1.658062789
+    max_ang: 1.658062789
+    intensity: true
+    frame_id: "cloud"
+    scanner_type: "sick_lms_5xx"
+    port: "2112"
+    timelimit: "5"
+    skip:0
