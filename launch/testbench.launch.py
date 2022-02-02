@@ -51,43 +51,60 @@ def generate_launch_description():
             'filters':'pointcloud'
         }.items()
     )
+    
+    launch_rosbridge_server_publisher = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('rosbridge_server'),
+                'launch',
+                'rosbridge_websocket.launch.py',
+                )
+            )
+    )
 
     ###########
     ## Nodes ##
     ###########
+    
     node_sick_lms511 = Node(
-            package='sick_scan',
-            executable='sick_generic_caller',
-            name='sick_scan_lms',
+        package='sick_scan',
+        executable='sick_generic_caller',
+        name='sick_scan_lms',
+        arguments=['./../config/launch/sick_lms_5xx.launch'],
     )
     #ros2 run sick_scan sick_generic_caller ./src/sick_scan_xd/launch/sick_lms_5xx.launch
     
+    node_infisense_p2 = Node(
+        package='thermal_cam',
+        executable='publish_thermal',
+        name='infisense_p2_publish'
+    )
 
     rviz2_sick_laserscan = Node(
-            package='rviz2',
-            executable='rviz2',
-            name='rviz2_sick_laserscan',
-            arguments=['-d',os.path.join( os.path.dirname( __file__ ), '..','config/rviz/sick_lms511.rviz' )]
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2_sick_laserscan',
+        arguments=['-d',os.path.join( os.path.dirname( __file__ ), '..','config/rviz/sick_lms511.rviz' )]
     )
 
     rviz2_intel_d415 = Node(
-            package='rviz2',
-            executable='rviz2',
-            name='rviz2_intel_d415',
-            arguments=['-d',os.path.join( os.path.dirname( __file__ ), '..','config/rviz/intel_d415.rviz' )]       
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2_intel_d415',
+        arguments=['-d',os.path.join( os.path.dirname( __file__ ), '..','config/rviz/intel_d415.rviz' )]       
     )
 
 
     rviz2_intel_d435 = Node(
-            package='rviz2',
-            executable='rviz2',
-            name='rviz2_intel_d435',
-            arguments=['-d',os.path.join( os.path.dirname( __file__ ), '..','config/rviz/intel_d435.rviz' )]
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2_intel_d435',
+        arguments=['-d',os.path.join( os.path.dirname( __file__ ), '..','config/rviz/intel_d435.rviz' )]
     )
 
     rosbag_master_node = Node(
-            package='rosbag_master',
-            executable='input_to_rosbag',
+        package='rosbag_master',
+        executable='input_to_rosbag',
     )
 	
     
@@ -95,15 +112,16 @@ def generate_launch_description():
 
 
     return LaunchDescription([
-         #launch-files
+        #launch-files
         launch_intel_d415,
         launch_intel_d435,
+        launch_rosbridge_server_publisher,
+
         #Nodes
+        node_infisense_p2,
         node_sick_lms511,
-        #rosbag_master_node,
         rviz2_sick_laserscan,
         rviz2_intel_d415,
         rviz2_intel_d435,
-        #laserscan_lms511,
 
     ])
