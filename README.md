@@ -67,6 +67,9 @@ pip install transforms3d
 pip install pandas
 pip3 install simplejpeg
 sudo apt get install ros-foxy-usb-cam
+python3 -m pip install pySMART
+sudo apt-get install smartmontools
+sudo apt-get install espeak
 
 #install librealsense sdk2.0
 https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md
