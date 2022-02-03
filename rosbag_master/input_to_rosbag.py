@@ -1,65 +1,66 @@
 import rclpy
+import subprocess
 from rclpy.node import Node
 from rclpy.serialization import serialize_message
 from std_msgs.msg import String
 from std_msgs.msg import ByteMultiArray
 from sensor_msgs.msg import Image
 from datetime import datetime
+from termcolor import colored
 
-import rosbag2_py
 
 class SimpleBagRecorder(Node):
     def __init__(self):
         super().__init__('simple_bag_recorder')
-
+        self.recording = False
         self.subscription_web = self.create_subscription(
-            ByteMultiArray,
-            'web_commands',
+            String,
+            '/webcommand',
             self.topic_callback_web,
             10
         )
         self.subscription_web
 
-    def topic_callback(self, msg):
-        self.writer.write(
-            'thermal_stream',
-            serialize_message(msg),
-            self.get_clock().now().nanoseconds)
-
     def topic_callback_web(self, data):
-        self.get_logger().info('Receiving Command')
+        now = datetime.now()
+        time_now = str(now).replace(' ','_').replace(':','-').replace('.','-')
+        print(colored('Receiving Cmd. Time: ' + time_now, 'white'))
+        cmd_sub = data.data.replace("true","1").replace("false","0")
+
+        if cmd_sub[0] =='1' and self.recording:
+            print(colored('Already Recording, Please Stop the Recording and Try again!\n', 'red'))
+
         #start, when the first bit of the command is true
-        if data.data[0]: #start
-            self.get_logger().info('Starting the Rosbag')
-            self.writer2 = rosbag2_py.SequentialWriter()
-            now = datetime.now()
+        elif cmd_sub[0] =='1' and not self.recording: #start
+            print(colored('Starting the Rosbag!\n', 'green'))
 
-            current_time = now.strftime("%H_%M_%S")
+            #check if there is a sensor that needs to be recorded
+            for x in cmd_sub[1:]:
+                if x == '1':
+                    self.recording = True
+                    break
+                if x == '0':
+                    continue
 
-            storage_options = rosbag2_py._storage.StorageOptions(
-                uri='my_bag_' + current_time,
-                storage_id='sqlite3')
-            converter_options = rosbag2_py._storage.ConverterOptions('', '')
-            self.writer2.open(storage_options, converter_options)
-
-            topic_info = rosbag2_py._storage.TopicMetadata(
-                name='thermal_stream',
-                type='sensor_msgs/msg/Image',
-                serialization_format='cdr')
-            self.writer2.create_topic(topic_info)
-
-            self.subscription = self.create_subscription(
-                Image,
-                'thermal_stream',
-                self.topic_callback,
-                10)
-            self.subscription
-
-        #stop when the first bit of the command is false
-        if not data.data[0]: #stop
-            self.get_logger().info('Stopping the Rosbag')
-            self.destroy_subscription
-            self.writer2.close()
+            #command-string for the subprocess
+            cmd_str = 'ros2 bag record '
+            if cmd_sub[1] == '1':
+                cmd_str += '/cloud'
+            if cmd_sub[2] == '1':
+                cmd_str += ''
+            if cmd_sub[3] == '1':
+                cmd_str += ''
+            if cmd_sub[4] == '1':
+                cmd_str += ''
+            if cmd_sub[5] == '1':
+                cmd_str += ''
+            
+        elif cmd_sub[0] == '0': #stop
+            print(colored('Stopping the Rosbag!\n', 'yellow'))
+            self.recording = False
+        
+        else:
+            print(colored('Web command is not valid!\n', 'red'))
 
 def main(args=None):
     rclpy.init(args=args)
