@@ -43,22 +43,33 @@ class SimpleBagRecorder(Node):
                     continue
 
             #command-string for the subprocess
-            cmd_str = 'ros2 bag record '
-            if cmd_sub[1] == '1':
-                cmd_str += '/cloud'
-            if cmd_sub[2] == '1':
-                cmd_str += ''
-            if cmd_sub[3] == '1':
-                cmd_str += ''
-            if cmd_sub[4] == '1':
-                cmd_str += ''
-            if cmd_sub[5] == '1':
+            self.proc = subprocess.Popen(['ros2', 'bag', 'record', '/webcommand'], cwd='/home/henry/master_ws/testbench_ws/rosbag') 
+           
+            
+
+
+
+
+
+            cmd_str = 'ros2 bag record -o ' + time_now
+
+            if cmd_sub[1] == '1': #SICK LMS 511
+                cmd_str += ' /cloud'
+            if cmd_sub[2] == '1': #Intel Realsense D415
+                cmd_str += ' /my_d415/color/image_raw'
+                cmd_str += ' /my_d415/depth/color/points'
+            if cmd_sub[3] == '1': #Intel Realsense D435
+                cmd_str += ' /my_d435/color/image_raw'
+                cmd_str += ' /my_d435/depth/color/points'
+            if cmd_sub[4] == '1': #Infisense P2
+                cmd_str += ' '
+            if cmd_sub[5] == '1': #Microsoft Webcam
                 cmd_str += ''
             
         elif cmd_sub[0] == '0': #stop
             print(colored('Stopping the Rosbag!\n', 'yellow'))
             self.recording = False
-        
+            self.proc.terminate()
         else:
             print(colored('Web command is not valid!\n', 'red'))
 

@@ -77,7 +77,8 @@ def generate_launch_description():
     node_infisense_p2 = Node(
         package='thermal_cam',
         executable='publish_thermal',
-        name='infisense_p2_publish'
+        name='infisense_p2_publish',
+        emulate_tty=True,
     )
 
     rviz2_sick_laserscan = Node(
