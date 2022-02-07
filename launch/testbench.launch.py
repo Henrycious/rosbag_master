@@ -106,6 +106,11 @@ def generate_launch_description():
         package='rosbag_master',
         executable='input_to_rosbag',
     )
+
+    rosboard_node = Node(
+        package='rosboard',
+        executable='rosboard_node'
+    )
 	
     
     
@@ -120,6 +125,10 @@ def generate_launch_description():
         #Nodes
         node_infisense_p2,
         node_sick_lms511,
+
+        rosbag_master_node,
+        rosboard_node,
+
         rviz2_sick_laserscan,
         rviz2_intel_d415,
         rviz2_intel_d435,
