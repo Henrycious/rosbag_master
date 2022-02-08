@@ -71,6 +71,11 @@ python3 -m pip install pySMART
 sudo apt-get install smartmontools
 sudo apt-get install espeak
 
+#Tracing: 
+sudo apt-get install lttng-tools liblttng-ust-dev
+sudo apt-get install python3-babeltrace python3-lttng
+sudo apt-get install lttng-modules-dkms
+
 #install librealsense sdk2.0
 https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md
 
